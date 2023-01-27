@@ -6,71 +6,17 @@ from sh import l_max, n_coeffs, sft, isft
 
 
 class MLPModel(torch.nn.Module):
-    def __init__(self):
+    def __init__(self, n_in, n_out):
         super().__init__()
-        self.fc1 = torch.nn.Linear(120, 256)
+        self.fc1 = torch.nn.Linear(n_in, 256)
         self.bn1 = torch.nn.BatchNorm1d(256)
         self.fc2 = torch.nn.Linear(256, 256)
         self.bn2 = torch.nn.BatchNorm1d(256)
         self.fc3 = torch.nn.Linear(256, 256)
         self.bn3 = torch.nn.BatchNorm1d(256)
-        self.fc4 = torch.nn.Linear(256, 2)
+        self.fc4 = torch.nn.Linear(256, n_out)
 
     def forward(self, x):
-        x = self.fc1(x)
-        x = self.bn1(x)
-        x = torch.nn.functional.relu(x)
-        x = self.fc2(x)
-        x = self.bn2(x)
-        x = torch.nn.functional.relu(x)
-        x = self.fc3(x)
-        x = self.bn3(x)
-        x = torch.nn.functional.relu(x)
-        x = self.fc4(x)
-        return x
-
-
-class PAMLPModel(torch.nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.fc1 = torch.nn.Linear(2, 256)
-        self.bn1 = torch.nn.BatchNorm1d(256)
-        self.fc2 = torch.nn.Linear(256, 256)
-        self.bn2 = torch.nn.BatchNorm1d(256)
-        self.fc3 = torch.nn.Linear(256, 256)
-        self.bn3 = torch.nn.BatchNorm1d(256)
-        self.fc4 = torch.nn.Linear(256, 2)
-
-    def forward(self, x):
-        x = torch.vstack(
-            (torch.mean(x[:, 0:60], dim=1), torch.mean(x[:, 60::], dim=1))
-        ).T
-        x = self.fc1(x)
-        x = self.bn1(x)
-        x = torch.nn.functional.relu(x)
-        x = self.fc2(x)
-        x = self.bn2(x)
-        x = torch.nn.functional.relu(x)
-        x = self.fc3(x)
-        x = self.bn3(x)
-        x = torch.nn.functional.relu(x)
-        x = self.fc4(x)
-        return x
-
-
-class SHMLPModel(torch.nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.fc1 = torch.nn.Linear(2 * n_coeffs, 256)
-        self.bn1 = torch.nn.BatchNorm1d(256)
-        self.fc2 = torch.nn.Linear(256, 256)
-        self.bn2 = torch.nn.BatchNorm1d(256)
-        self.fc3 = torch.nn.Linear(256, 256)
-        self.bn3 = torch.nn.BatchNorm1d(256)
-        self.fc4 = torch.nn.Linear(256, 2)
-
-    def forward(self, x):
-        x = x.reshape(-1, 2 * n_coeffs)
         x = self.fc1(x)
         x = self.bn1(x)
         x = torch.nn.functional.relu(x)
@@ -114,16 +60,16 @@ class SphConv(torch.nn.Module):
 
 
 class SCNNModel(torch.nn.Module):
-    def __init__(self, l_max):
+    def __init__(self, n_in, n_out, l_max):
         super().__init__()
-        self.conv1 = SphConv(l_max, 2, 16)
+        self.conv1 = SphConv(l_max, n_in, 16)
         self.conv2 = SphConv(l_max, 16, 32)
         self.conv3 = SphConv(l_max, 32, 64)
         self.fc1 = torch.nn.Linear(64, 128)
         self.bn1 = torch.nn.BatchNorm1d(128)
         self.fc2 = torch.nn.Linear(128, 128)
         self.bn2 = torch.nn.BatchNorm1d(128)
-        self.fc3 = torch.nn.Linear(128, 2)
+        self.fc3 = torch.nn.Linear(128, n_out)
         self.register_buffer("sft", sft)
         self.register_buffer("isft", isft)
 

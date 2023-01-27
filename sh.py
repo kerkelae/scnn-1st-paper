@@ -6,7 +6,7 @@ from scipy.special import sph_harm
 import torch
 
 
-l_max = 10
+l_max = 16
 n_coeffs = int(0.5 * (l_max + 1) * (l_max + 2))
 
 ls = torch.zeros(n_coeffs, dtype=int)
@@ -34,7 +34,7 @@ vertices = torch.vstack(
     [torch.tensor(i) for i in hp.pix2vec(n_sides, np.arange(12 * n_sides**2))]
 ).T
 thetas = torch.arccos(vertices[:, 2])
-phis = torch.arctan2(vertices[:, 1], vertices[:, 0]) + math.pi
+phis = torch.arctan2(vertices[:, 1], vertices[:, 0]) + math.pi / 2
 isft = torch.zeros((len(vertices), n_coeffs))
 for l in range(0, l_max + 1, 2):
     for m in range(-l, l + 1):
